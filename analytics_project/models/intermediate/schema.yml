@@ -1,0 +1,273 @@
+version: 2
+
+models:
+
+  - name: dim_brands
+    description: "Dimension table containing cleaned and deduplicated brand information. 
+    Includes only records with non-null `brand_code` and one record per unique `brand_id`"
+    columns:
+      - name: brand_id
+        description: "Unique identifier for each brand. Serves as the primary key"
+
+      - name: barcode
+        description: "The barcode on the item"
+
+      - name: brand_code
+        description: "String that corresponds with the brand column in a partner product file. Acts as a foreign key."
+
+      - name: brand_category
+        description: "The category name for which the brand sells products in"
+
+      - name: brand_category_code
+        description: "The category code that references a BrandCategory"
+
+      - name: cpg_id
+        description: "Reference to CPG collection"
+
+      - name: cpg_ref
+        description: "Reference to CPG collection"
+
+      - name: top_brand
+        description: "Boolean indicator for whether the brand should be featured as a 'top brand'"
+
+      - name: brand_name
+        description: "Brand name"
+
+
+  - name: dim_users
+    description: "Dimension table containing unique consumer users. 
+    Only users with role = 'CONSUMER' are included. 
+    In case of duplicates, only the most recent record per `user_id` is retained based on `created_date`."
+    columns:
+      - name: user_id
+        description: "Unique identifier for each user. Serves as the primary key"
+
+      - name: state
+        description: "User's State abbreviation"
+
+      - name: created_date
+        description: "When the user created their account"
+
+      - name: last_login_date
+        description: "Last time the user was recorded logging in to the app"
+
+      - name: role
+        description: "Constant value set to 'CONSUMER'"
+
+      - name: active
+        description: "Indicates if the user is active; only Fetch will de-activate an account with this flag"
+
+      - name: signup_source
+        description: "Indicates whether the user signed up via GOOGLE or EMAIL"
+
+
+  - name: fct_receipt_items
+    description: "Fact table containing detailed information about individual items on receipts.
+    Only one record per `receipt_item_id` is retained to eliminate duplicates.
+    Includes item-level metadata, pricing details, flags, and brand references"
+    columns:
+      - name: receipt_item_id
+        description: "Unique identifier for each item. Serves as the primary key"
+
+      - name: receipt_id
+        description: "Unique identifier linking this item to a receipt. Acts as a foreign key."
+
+      - name: user_id
+        description: "String id back to the User collection for the user who scanned the receipt. Acts as a foreign key."
+
+      - name: campaingn_id
+        description: "Campaign ID associated with the item"
+
+      - name: price_after_coupon
+        description: "Final price of the item after coupon discount"
+
+      - name: deleted
+        description: "Boolean flag indicating whether the item was deleted"
+
+      - name: original_final_price
+        description: "Original final price of the item before any discounts"
+
+      - name: competitive_product
+        description: "Boolean indicating if the item is considered a competitive product"
+
+      - name: points_earned
+        description: "Number of points earned for purchasing this item"
+
+      - name: original_quantity_purchased
+        description: "Original quantity of the item purchased"
+
+      - name: competitor_rewards_group
+        description: "Competitor's rewards group classification for the item"
+
+      - name: item_number
+        description: "Unique identifier for the item"
+
+      - name: original_barcode
+        description: "Original barcode of the item"
+
+      - name: brand_code
+        description: "Brand code associated with the item. Acts as a foreign key."
+
+      - name: rewards_product_partner_id
+        description: "ID of the product partner in the rewards program"
+
+      - name: discounted_item_price
+        description: "Price of the item after applying discounts"
+
+      - name: original_description
+        description: "Original description of the item from MetaBrite"
+
+      - name: user_flagged_description
+        description: "User-submitted description of the item"
+
+      - name: rewards_group
+        description: "Rewards group classification of the item"
+
+      - name: needs_fetch_review_reason
+        description: "Reason why this item requires fetch review"
+
+      - name: user_flagged_quantity
+        description: "Quantity of the item flagged by the user"
+
+      - name: points_payer_id
+        description: "ID of the entity responsible for paying points"
+
+      - name: target_price
+        description: "Target price for the item"
+
+      - name: points_not_awarded_reason
+        description: "Reason why points were not awarded for this item"
+
+      - name: user_flagged_price
+        description: "Price flagged by the user"
+
+      - name: final_price
+        description: "Final price of the item after all discounts and promotions"
+
+      - name: original_item_price
+        description: "Original price of the item before any modifications"
+
+      - name: user_flagged_new_item
+        description: "Boolean indicating if the item was flagged as new by the user"
+
+      - name: quantity_purshased
+        description: "Number of units of the item purchased"
+
+      - name: user_flagged_barcode
+        description: "Barcode manually flagged by the user"
+
+      - name: prevent_target_gap_points
+        description: "Boolean flag to prevent target gap points being awarded"
+
+      - name: partner_item_id
+        description: "Partner-specific ID for the item"
+
+      - name: barcode
+        description: "Barcode of the item"
+
+      - name: needs_fetch_review
+        description: "Boolean flag indicating whether this item requires a fetch review"
+
+      - name: item_price
+        description: "Price of the item"
+
+      - name: original_receipt_item_text
+        description: "Original item text as recorded in the receipt"
+
+      - name: description
+        description: "Uppercased description of the item"
+
+
+  - name: fct_receipts_finished
+    description: "Filtered fact table containing only receipts with a `FINISHED` status and linked to valid users from `dim_users`.
+    This table represents fully processed transactions that are ready for analysis, with one record per receipt."
+    columns:
+      - name: receipt_id
+        description: "Unique identifier for each receipt. Serves as the primary key"
+
+      - name: bonus_points_earned
+        description: "Number of bonus points that were awarded upon receipt completion"
+  
+      - name: bonus_points_earned_reason
+        description: "Event that triggered bonus points"
+
+      - name: created_date
+        description: "The date that the event was created"
+
+      - name: scanned_date
+        description: "Date that the user scanned their receipt"
+
+      - name: finished_date
+        description: "Date that the receipt finished processing"
+
+      - name: modify_date
+        description: "The date the event was modified"
+
+      - name: purchase_date
+        description: "The date of the purchase"
+
+      - name: points_awarded_date
+        description: "The date we awarded points for the transaction"
+
+      - name: points_earned
+        description: "The number of points earned for the receipt"
+
+      - name: purchased_item_count
+        description: "Count of number of items on the receipt"
+
+      - name: rewards_receipt_status
+        description: "Status of the receipt through receipt validation and processing"
+
+      - name: total_spent
+        description: "The total amount on the receipt"
+
+      - name: user_id
+        description: "String id back to the User collection for the user who scanned the receipt. Acts as a foreign key."
+
+
+  - name: fct_receipts
+    description: "Fact table containing receipt-level information. 
+    Includes one record per `receipt_id`, keeping only the most recent based on `created_date` to eliminate duplicates.
+    Captures key dates, user information, total spend, reward points, and receipt status."
+    columns:
+      - name: receipt_id
+        description: "Unique identifier for each receipt. Serves as the primary key"
+
+      - name: bonus_points_earned
+        description: "Number of bonus points that were awarded upon receipt completion"
+  
+      - name: bonus_points_earned_reason
+        description: "Event that triggered bonus points"
+
+      - name: created_date
+        description: "The date that the event was created"
+
+      - name: scanned_date
+        description: "Date that the user scanned their receipt"
+
+      - name: finished_date
+        description: "Date that the receipt finished processing"
+
+      - name: modify_date
+        description: "The date the event was modified"
+
+      - name: purchase_date
+        description: "The date of the purchase"
+
+      - name: points_awarded_date
+        description: "The date we awarded points for the transaction"
+
+      - name: points_earned
+        description: "The number of points earned for the receipt"
+
+      - name: purchased_item_count
+        description: "Count of number of items on the receipt"
+
+      - name: rewards_receipt_status
+        description: "Status of the receipt through receipt validation and processing"
+
+      - name: total_spent
+        description: "The total amount on the receipt"
+
+      - name: user_id
+        description: "String id back to the User collection for the user who scanned the receipt. Acts as a foreign key."
