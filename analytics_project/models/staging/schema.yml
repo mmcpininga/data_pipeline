@@ -1,0 +1,337 @@
+version: 2
+
+models:
+
+  - name: stg_brands
+    description: "Staging table for brands"
+    columns:
+      - name: brand_id
+        description: "Unique identifier for each brand. Serves as the primary key"
+        tests:
+          - unique
+          - not_null
+
+      - name: barcode
+        description: "The barcode on the item"
+        tests:
+          - not_null
+
+      - name: brand_code
+        description: "String that corresponds with the brand column in a partner product file. Acts as a foreign key."
+
+      - name: brand_category
+        description: "The category name for which the brand sells products in"
+
+      - name: brand_category_code
+        description: "The category code that references a BrandCategory"
+
+      - name: cpg_id
+        description: "Reference to CPG collection"
+
+      - name: cpg_ref
+        description: "Reference to CPG collection"
+
+      - name: top_brand
+        description: "Boolean indicator for whether the brand should be featured as a 'top brand'"
+
+      - name: brand_name
+        description: "Brand name"
+
+
+  - name: stg_receipts
+    description: "Staging table for receipts"
+    columns:
+      - name: receipt_id
+        description: "Unique identifier for each receipt. Serves as the primary key"
+        tests:
+          - unique
+          - not_null
+
+      - name: bonus_points_earned
+        description: "Number of bonus points that were awarded upon receipt completion"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0 
+
+      - name: bonus_points_earned_reason
+        description: "Event that triggered bonus points"
+
+      - name: created_date
+        description: "The date that the event was created"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "DATETIME '2014-01-01 00:00:00'"
+              max_value: "DATETIME(CURRENT_TIMESTAMP())"
+
+      - name: scanned_date
+        description: "Date that the user scanned their receipt"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "DATETIME '2014-01-01 00:00:00'"
+              max_value: "DATETIME(CURRENT_TIMESTAMP())"
+
+      - name: finished_date
+        description: "Date that the receipt finished processing"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "DATETIME '2014-01-01 00:00:00'"
+              max_value: "DATETIME(CURRENT_TIMESTAMP())"
+
+      - name: modify_date
+        description: "The date the event was modified"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "DATETIME '2014-01-01 00:00:00'"
+              max_value: "DATETIME(CURRENT_TIMESTAMP())"
+
+      - name: purchase_date
+        description: "The date of the purchase"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "DATETIME '2014-01-01 00:00:00'"
+              max_value: "DATETIME(CURRENT_TIMESTAMP())"
+
+      - name: points_awarded_date
+        description: "The date we awarded points for the transaction"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "DATETIME '2014-01-01 00:00:00'"
+              max_value: "DATETIME(CURRENT_TIMESTAMP())"
+
+      - name: points_earned
+        description: "The number of points earned for the receipt"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0 
+
+      - name: purchased_item_count
+        description: "Count of number of items on the receipt"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 1 
+
+      - name: rewards_receipt_status
+        description: "Status of the receipt through receipt validation and processing"
+        tests:
+          - accepted_values:
+              values: ['FLAGGED', 'SUBMITTED', 'PENDING', 'FINISHED', 'REJECTED']
+
+      - name: total_spent
+        description: "The total amount on the receipt"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0 
+
+      - name: user_id
+        description: "String id back to the User collection for the user who scanned the receipt. Acts as a foreign key."
+        tests:
+          - not_null
+
+
+  - name: stg_receipt_items
+    description: "Staging table for receipt items, extracted from raw receipts data"
+    columns:
+      - name: receipt_item_id
+        description: "Unique identifier for each item. Serves as the primary key"
+        tests:
+          - unique
+          - not_null
+
+      - name: receipt_id
+        description: "Unique identifier linking this item to a receipt. Acts as a foreign key."
+        tests:
+          - relationships:
+              to: ref('stg_receipts')
+              field: receipt_id
+
+      - name: user_id
+        description: "String id back to the User collection for the user who scanned the receipt. Acts as a foreign key."
+        tests:
+          - relationships:
+              to: ref('stg_users')
+              field: user_id
+
+      - name: campaingn_id
+        description: "Campaign ID associated with the item"
+
+      - name: price_after_coupon
+        description: "Final price of the item after coupon discount"
+
+      - name: deleted
+        description: "Boolean flag indicating whether the item was deleted"
+
+      - name: original_final_price
+        description: "Original final price of the item before any discounts"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0 
+
+      - name: competitive_product
+        description: "Boolean indicating if the item is considered a competitive product"
+
+      - name: points_earned
+        description: "Number of points earned for purchasing this item"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0 
+
+      - name: original_quantity_purchased
+        description: "Original quantity of the item purchased"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0 
+
+      - name: competitor_rewards_group
+        description: "Competitor's rewards group classification for the item"
+
+      - name: item_number
+        description: "Unique identifier for the item"
+
+      - name: original_barcode
+        description: "Original barcode of the item"
+
+      - name: brand_code
+        description: "Brand code associated with the item. Acts as a foreign key."
+
+      - name: rewards_product_partner_id
+        description: "ID of the product partner in the rewards program"
+
+      - name: discounted_item_price
+        description: "Price of the item after applying discounts"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0 
+
+      - name: original_description
+        description: "Original description of the item from MetaBrite"
+
+      - name: user_flagged_description
+        description: "User-submitted description of the item"
+
+      - name: rewards_group
+        description: "Rewards group classification of the item"
+        tests:
+          - not_null
+
+      - name: needs_fetch_review_reason
+        description: "Reason why this item requires fetch review"
+
+      - name: user_flagged_quantity
+        description: "Quantity of the item flagged by the user"
+
+      - name: points_payer_id
+        description: "ID of the entity responsible for paying points"
+
+      - name: target_price
+        description: "Target price for the item"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0 
+
+      - name: points_not_awarded_reason
+        description: "Reason why points were not awarded for this item"
+
+      - name: user_flagged_price
+        description: "Price flagged by the user"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0 
+
+      - name: final_price
+        description: "Final price of the item after all discounts and promotions"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0 
+
+      - name: original_item_price
+        description: "Original price of the item before any modifications"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0 
+
+      - name: user_flagged_new_item
+        description: "Boolean indicating if the item was flagged as new by the user"
+
+      - name: quantity_purshased
+        description: "Number of units of the item purchased"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0 
+
+      - name: user_flagged_barcode
+        description: "Barcode manually flagged by the user"
+
+      - name: prevent_target_gap_points
+        description: "Boolean flag to prevent target gap points being awarded"
+
+      - name: partner_item_id
+        description: "Partner-specific ID for the item"
+
+      - name: barcode
+        description: "Barcode of the item"
+        tests:
+          - not_null
+
+      - name: needs_fetch_review
+        description: "Boolean flag indicating whether this item requires a fetch review"
+
+      - name: item_price
+        description: "Price of the item"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: 0 
+
+      - name: original_receipt_item_text
+        description: "Original item text as recorded in the receipt"
+
+      - name: description
+        description: "Uppercased description of the item"
+
+
+  - name: stg_users
+    description: "Staging table for users"
+    columns:
+      - name: user_id
+        description: "Unique identifier for each user. Serves as the primary key"
+        tests:
+          - unique
+          - not_null
+
+      - name: state
+        description: "User's State abbreviation"
+
+      - name: created_date
+        description: "When the user created their account"
+        tests:
+          - not_null
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "DATETIME '2014-01-01 00:00:00'"
+              max_value: "DATETIME(CURRENT_TIMESTAMP())"
+
+      - name: last_login_date
+        description: "Last time the user was recorded logging in to the app"
+        tests:
+          - dbt_expectations.expect_column_values_to_be_between:
+              min_value: "DATETIME '2014-01-01 00:00:00'"
+              max_value: "DATETIME(CURRENT_TIMESTAMP())"
+
+      - name: role
+        description: "Constant value set to 'CONSUMER'"
+        tests:
+          - not_null
+          - accepted_values:
+              values: ['CONSUMER']
+
+      - name: active
+        description: "Indicates if the user is active; only Fetch will de-activate an account with this flag"
+
+      - name: signup_source
+        description: "Indicates whether the user signed up via GOOGLE or EMAIL"
+        tests:
+          - accepted_values:
+              values: ['GOOGLE', 'EMAIL'] 

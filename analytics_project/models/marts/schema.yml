@@ -1,0 +1,88 @@
+version: 2
+
+models:
+
+  - name: q1_mart_top5_brands_by_month
+    description: "This model returns the top 5 brands based on the number of receipts scanned in the most recent month available in the data.
+    Only receipts with status 'FINISHED' are included, and only users with role 'CONSUMER' from the `dim_users` table are considered.
+    In cases where the most recent month has insufficient data (e.g., February 2021), the analysis falls back to the previous month (e.g., January 2021).
+    Each brand is ranked using DENSE_RANK based on the number of distinct receipts."
+    columns:
+      - name: scanned_month
+        description: "The month (truncated to first day) in which the receipt was scanned."
+
+      - name: brand_name
+        description: "The name of the brand as listed in the `dim_brands` table."
+
+      - name: rank_position
+        description: "Ranking position of the brand based on the number of distinct receipts scanned for the given month."
+
+
+  - name: q2_mart_top5_brands_monthly_comparison
+    description: "This table compares the top 5 brands by receipt count between the most recent and the previous month.
+      It uses DENSE_RANK to identify ranking shifts over time and helps track brand popularity trends.
+      Only receipts with 'FINISHED' status and users with the 'CONSUMER' role from the dim_users table are considered.
+      Brand names are matched through brand_code_adj in dim_brands.
+      If receipt data exists for both months, the model outputs brand rankings for each period."
+    columns:
+      - name: brand_name
+        description: "The name of the brand as listed in the `dim_brands` table."
+
+      - name: recent_month
+        description: "Most recent month (truncated to first day) in which the receipt was scanned."
+
+      - name: previous_month
+        description: "Month immediately preceding the recent_month (truncated to first day) in which the receipt was scanned."
+
+      - name: recent_rank
+        description: "Brand's ranking position based on number of receipts scanned in the most recent month."
+
+      - name: previous_rank
+        description: "Brand's ranking position based on number of receipts scanned in the previous month."
+
+
+  - name: q3_mart_avg_spend_by_status
+    description: "Compares the average total spend from receipts with status 'FINISHED' and 'REJECTED'.
+      This model helps identify spending patterns by receipt status."
+    columns:
+      - name: rewards_receipt_status
+        description: "Status of the receipt. Only 'FINISHED' and 'REJECTED' are considered."
+
+      - name: avg_total_spend
+        description: "Average amount spent per receipt for each status."
+
+
+  - name: q4_mart_total_items_by_status
+    description: "Compares the total number of items purchased from receipts with status 'FINISHED' and 'REJECTED'.
+      This model helps assess the relationship between receipt status and purchase volume."
+    columns:
+      - name: rewards_receipt_status
+        description: "Status of the receipt. Only 'FINISHED' and 'REJECTED' are considered."
+
+      - name: total_purchased_item
+        description: "Total number of items purchased across all receipts for each status. Nulls are handled as zero."
+
+
+  - name: q5_mart_top_brand_by_spend_new_users
+    description: "Identifies the brand with the highest total spend among users created within the past 6 months.
+      The analysis includes only receipts with 'FINISHED' status and users classified as 'CONSUMER' from the `dim_users` table.
+      A rolling six-month window is calculated based on the latest user creation date in the dataset."
+    columns:
+      - name: brand_name
+        description: "The name of the brand as listed in the `dim_brands` table"
+
+      - name: total_spend
+        description: "Total amount spent on each brand by users who were created in the last six months."
+
+
+  - name: q6_mart_top_brand_by_transactions_new_users
+    description: "Identifies the brand with the highest number of transactions (i.e., scanned receipts) among users created within the past 6 months.
+      The analysis considers only receipts with a 'FINISHED' status and users labeled as 'CONSUMER' from the `dim_users` table.
+      A rolling six-month window is calculated based on the latest user creation date."
+    columns:
+      - name: brand_name
+        description: "The name of the brand as listed in the `dim_brands` table"
+
+      - name: receipt_count
+        description: "Total number of distinct receipts (transactions) associated with the brand, from users created in the last six months."
+
