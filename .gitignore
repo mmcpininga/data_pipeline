@@ -1,0 +1,9 @@
+
+analytics_project/target/
+analytics_project/dbt_packages/
+analytics_project/logs/
+
+analytics_project/data/
+analytics_project/assets/
+
+venv/
