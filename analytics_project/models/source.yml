@@ -1,0 +1,33 @@
+version: 2
+
+sources:  
+  - name: source_external
+    database: fetch-453421
+    description: "Raw data ingested from external sources. This dataset includes brands, receipts, and user information before transformation"
+    tables:
+      - name: brands
+        columns:
+          - name: _id.oid
+            tests:
+              - unique:
+                  severity: warn
+              - not_null:
+                  severity: warn
+
+      - name: receipts
+        columns:
+          - name: _id.oid
+            tests:
+              - unique:
+                  severity: warn
+              - not_null:
+                  severity: warn
+
+      - name: users
+        columns:
+          - name: _id.oid
+            tests:
+              - unique:
+                  severity: warn
+              - not_null:
+                  severity: warn
