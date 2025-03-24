@@ -66,36 +66,41 @@ Here’s a quick summary of some data issues I found, along with their potential
 We need to understand whether users can create multiple accounts, which could lead to duplicates in our database.
 In the current dataset, 283 users (or 57%) appear as duplicates. Are these duplicates real users with mutiple accounts,
 or are they caused by system-generated errors?
-    - *Impact:* These duplicates were not included in the previous analysis, meaning the insights might not fully reflect user behavior.
-    However, if not removed it may increase the user count.
+
+*Impact:* These duplicates were not included in the previous analysis, meaning the insights might not fully reflect user behavior. However, if not removed it may increase the user count.
 
 2. Understanding receipts without registered users
 
 We need to clarify whether a user can submit a receipt without first creating an account.
 Currently, 13% of finalized receipts are linked to users who do not exist in our database. This raises an important question: how these receipts are being processed? 
-    - *Impact:* The analysis only considered receipts from registered users, meaning receipts from unregistered users were excluded.
+
+*Impact:* The analysis only considered receipts from registered users, meaning receipts from unregistered users were excluded.
 
 3. Understanding the `fetch-staff` user role
 
 We need to better understand the `fetch-staff` user role and how it differs from `consumer` users. 
 In the dataset, 15% of users (82) have the `fetch-staff` role, while 413 users are classified as `consumer`.
-    - *Impact:* Only `consumer` users were considered, meaning `fetch-staff` users were excluded since the study only concerns consumers.
+
+*Impact:* Only `consumer` users were considered, meaning `fetch-staff` users were excluded since the study only concerns consumers.
 
 4. Clarifying receipt statuses
 
 We need to better understand how and when receipt statuses (`Pending`, `Flagged`, `Submitted`, `Finished`, and `Rejected`) are assigned.
-    - *Impact:* I treated `Finished` as equivalent to `Accepted` when comparing receipts by status. However, for all other analyses, I used only `Finished` to maintain consistency.
+
+*Impact:* I treated `Finished` as equivalent to `Accepted` when comparing receipts by status. However, for all other analyses, I used only `Finished` to maintain consistency.
 
 5. Understanding the brand creation process
 
 We need to gain better clarity on how new brands are created or registered in the system.
 Currently, 23% of brands do not have a brand code, even though they contain key information such as a brand name. 
-    - *Impact:* I excluded all records with missing brand codes to ensure data consistency and avoid incorrect brand attribution in the analysis. However this may affect marketing or product decisions as we are not considering some brands.
+
+*Impact:* I excluded all records with missing brand codes to ensure data consistency and avoid incorrect brand attribution in the analysis. However this may affect marketing or product decisions as we are not considering some brands.
 
 6. Receipts with zero purchased items still earning points
 
 I identified `Finished` receipts where the number of purchased items is zero, or the total spend is $0 but these receipts still earned reward points. This raises an important question: how exactly are rewards being calculated?
-    - *Impact:* These cases were not removed from the dataset, as we still need to understand whether they are valid or represent a data quality issue. But incorrectly assigned rewards could reflect both system errors and negatively impact the user experience.
+
+*Impact:* These cases were not removed from the dataset, as we still need to understand whether they are valid or represent a data quality issue. But incorrectly assigned rewards could reflect both system errors and negatively impact the user experience.
 
 
 Understanding these issues will help us refine the analysis and feel more confident in the results. 
