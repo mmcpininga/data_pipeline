@@ -86,6 +86,7 @@ In the dataset, 15% of users (82) have the `fetch-staff` role, while 413 users a
 **4. Clarifying receipt statuses**
 
 We need to better understand how and when receipt statuses (`Pending`, `Flagged`, `Submitted`, `Finished`, and `Rejected`) are assigned.
+
 *Impact:* I treated `Finished` as equivalent to `Accepted` when comparing receipts by status. However, for all other analyses, I used only `Finished` to maintain consistency.
 
 **5. Understanding the brand creation process**
